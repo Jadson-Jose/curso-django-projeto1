@@ -2,9 +2,9 @@ version: '3.8'
 
 services:
   web: 
-    build:  .
+    build: .
     container_name: django_web
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "chmod +x wait-for-db.sh && ./wait-for-db.sh db 5432 python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
@@ -12,24 +12,26 @@ services:
     environment:
       - SECRET_KEY=django-insecure-w4p^5*3zeebdz6r=021sein4mcm551o+n9%vfhf=i9dd^efzgv
       - DEBUG=1
-      - DATABASE_URL=postgres://POSTGRES_USER:POSTGRES_PASSWORD@db:5432/dbname # Lembre-se de configurar isso para 'postgres://POSTGRES_USER:POSTGRES_PASSWORD@db:5432/dbname' ou similar depois
+      - DATABASE_URL=postgres://jadson:285903@db:5432/dbname
     depends_on:
-      - db
-    
+      db:
+        condition: service_healthy
 
   db: 
     image: postgres:15
     container_name: postgres_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data/ 
-
+      - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=dbname
-      - POSTGRES_USER=POSTGRES_USER 
-      - POSTGRES_PASSWORD=POSTGRES_PASSWORD
+      - POSTGRES_USER=jadson
+      - POSTGRES_PASSWORD=285903
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jadson -d dbname"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
 
-
 volumes: 
-  postgres_data: 
-    
+  postgres_data:
