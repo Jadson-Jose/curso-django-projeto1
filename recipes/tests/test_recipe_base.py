@@ -3,6 +3,8 @@ from recipes.models import Category, Recipe, User
 
 class RecipeTestBase(TestCase):
     def setUp(self):
+        self.category = self.make_category(name="Default Category")
+        self.author = self.make_author(username="defaultuser")
         return super().setUp()
     
     def make_category(self, name='Category'):
@@ -26,8 +28,8 @@ class RecipeTestBase(TestCase):
         
     def make_recipe(
         self,
-        category_data=None,
-        author_data=None,
+        category=None,
+        author=None,
         title='Recipe Title',
         description='Recipe Description',
         slug='recipe-slug',
@@ -39,15 +41,15 @@ class RecipeTestBase(TestCase):
         preparation_steps_is_html=False,
         is_published=True
     ):
-        if category_data is None:
-            category_data = {}
+        if category is None:
+            category = self.category
             
-        if author_data is None:
-            author_data = {}
+        if author is None:
+            author = self.author
         
         return Recipe.objects.create(
-            category=self.make_category(**category_data),
-            author=self.make_author(**author_data),
+            category=category,
+            author=author,
             title=title,
             description=description,
             slug=slug,
