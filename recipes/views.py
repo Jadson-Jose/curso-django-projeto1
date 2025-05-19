@@ -14,10 +14,11 @@ def home(request):
     
 def category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
+    
     recipes = get_list_or_404(
         Recipe.objects.filter(
             category=category,
-            is_published=True
+            is_published=True  
         ).order_by('-id')
     )
     
