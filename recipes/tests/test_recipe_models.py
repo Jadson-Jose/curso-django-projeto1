@@ -1,5 +1,5 @@
 from django.forms import ValidationError
-from .test_recipe_base import RecipeTestBase 
+from .test_recipe_base import RecipeTestBase, Recipe 
 from parameterized import parameterized
 
 
@@ -7,6 +7,24 @@ class RecipeModelTest(RecipeTestBase):
     def setUp(self):
         super().setUp()
         self.recipe = self.make_recipe()
+        
+    def make_recipe_no_defaults(self):
+        recipe = Recipe(
+            category=self.make_category(name='Test Default Category'),
+            author=self.make_author(username='newusr'),
+            title='Recipe Title',
+            description='Recipe Description',
+            slug='recipe-slug',
+            preparation_time=10,
+            preparation_time_unit='Minutos',
+            servings=5,
+            servings_unit='Porções',
+            preparation_steps='Recipe Preparation Steps',
+            cover='cover.jpg'
+        )
+        recipe.full_clean()
+        recipe.save()
+        return recipe
             
     @parameterized.expand([
             ('title', 65),
@@ -20,3 +38,10 @@ class RecipeModelTest(RecipeTestBase):
             # Comente a linha abaixo para não executar a validação
             self.recipe.full_clean()
             
+    def test_recipe_preparation_steps_is_html_is_false_by_default(self):
+        recipe = self.make_recipe_no_defaults()
+        self.assertFalse(recipe.preparation_steps_is_html, msg='Recipe prepatation_steps_is_html is not False.')
+            
+    def test_recipe_is_published_is_false_by_default(self):
+        recipe = self.make_recipe_no_defaults()
+        self.assertFalse(recipe.is_published, msg='Recipe is_published is not false.')
