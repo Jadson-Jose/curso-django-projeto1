@@ -98,6 +98,10 @@ class RecipeViwesTest(RecipeTestBase):
         resolved = resolve(url)
         self.assertIs(resolved.func, views.search)
  
-    def test_recipe_search_loads_correc_template(self):
-        reponse = self.client.get(reverse('recipes:search'))
+    def test_recipe_search_loads_correct_template(self):
+        reponse = self.client.get(reverse('recipes:search') + '?q=teste')
         self.assertTemplateUsed(reponse, 'recipes/pages/search.html')
+        
+    def test_recipe_search_raises_404_if_no_search_term(self):
+        response = self.client.get(reverse('recipes:search'))
+        self.assertEqual(response.status_code, 404)
