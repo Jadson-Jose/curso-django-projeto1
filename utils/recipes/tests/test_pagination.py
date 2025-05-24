@@ -6,7 +6,7 @@ class PaginationTest(TestCase):
     def test_make_pagination_range_returns_a_pagination_range(self):
         paginaion = make_pagination_range(
             page_range=list(range(1, 21)),
-            qty_paginas=4,
+            qty_pages=4,
             current_page=1,
         )
         
@@ -15,7 +15,7 @@ class PaginationTest(TestCase):
     def test_first_range_is_static_if_current_page_is_less_than_middle_page(self):
         paginaion = make_pagination_range(
             page_range=list(range(1, 21)),
-            qty_paginas=4,
+            qty_pages=4,
             current_page=2,
         )
         
