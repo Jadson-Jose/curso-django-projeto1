@@ -1,17 +1,14 @@
 #!/bin/sh
-# wait-for-db.sh
-
-set -e
 
 host="$1"
 port="$2"
-shift 2
-cmd="$@"
+shift 2  # Remove os dois primeiros parâmetros (host e porta)
+command="$@"
 
-until nc -z "$host" "$port"; do
+until pg_isready -h "$host" -p "$port" -U jadson -d dbname; do
   echo "PostgreSQL não está disponível - aguardando ($host:$port)..."
   sleep 2
 done
 
-echo "PostgreSQL está pronto! Executando: $cmd"
-exec $cmd
+echo "PostgreSQL pronto! Executando comando: $command"
+exec $command

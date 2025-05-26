@@ -1,41 +1,29 @@
-version: '3.9'  # Adicione a versão do Compose
-
 services:
-  web: 
-    build: .  # Indica que o Dockerfile está na raiz do projeto
-    container_name: django_web
-    command: sh -c "./wait-for-db.sh db 5432 && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
+  web:
+    build: .
+    command: sh -c "./wait-for-db.sh db 5432 python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     environment:
-      - SECRET_KEY=django-insecure-w4p^5*3zeebdz6r=021sein4mcm551o+n9%vfhf=i9dd^efzgv
-      - DEBUG=1
-      - POSTGRES_DB=dbname
-      - POSTGRES_USER=jadson
-      - POSTGRES_PASSWORD=285903
-      - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
+      - DATABASE_URL=postgres://jadson:285903@db:5432/dbname
     depends_on:
       db:
         condition: service_healthy
+    ports:
+      - "8000:8000"  # <--- Adicionado aqui
 
-  db: 
+
+  db:
     image: postgres:15
-    container_name: postgres_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=dbname
       - POSTGRES_USER=jadson
       - POSTGRES_PASSWORD=285903
+      - POSTGRES_DB=dbname
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U jadson -d dbname -h 127.0.0.1"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U jadson -d dbname"]
+      interval: 10s
       timeout: 5s
-      retries: 10
-    restart: unless-stopped
+      retries: 20
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
 
-volumes: 
+volumes:
   postgres_data:
